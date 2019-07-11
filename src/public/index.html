@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Simplest web page</title>
+  </head>
+  <body>
+    This is a static web page!
+  </body>
+
+  <script>
+    const axios = require("axios");
+    console.log("ola 2");
+    // Make a request for a user with a given ID
+    axios
+      .get("/rest/data")
+      .then(function(response) {
+        // handle success
+        console.log("ola");
+        document.write("Num Rows: " + response.numRows);
+      })
+      .catch(function(error) {
+        // handle error
+        console.log(error);
+      })
+      .finally(function() {
+        // always executed
+      });
+  </script>
+</html>
