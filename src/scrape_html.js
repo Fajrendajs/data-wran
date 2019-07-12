@@ -207,17 +207,13 @@ function handlestats(data) {
     obj.teamhomevictory = obj.teamhomevictory + 1;
   }
   // team home lost
-  if (
-    data["teamplace"] === "vs" &&
-    data["teamponits"] < data["opponentteampoints"]
-  ) {
+  if (data["teamplace"] === "vs" &&
+    data["teamponits"] < data["opponentteampoints"]) {
     obj.teamhomevictory = obj.teamhomevictory + 1;
   }
   // team away lost
-  if (
-    data["teamplace"] !== "vs" &&
-    data["teamponits"] < data["opponentteampoints"]
-  ) {
+  if (data["teamplace"] !== "vs" &&
+    data["teamponits"] < data["opponentteampoints"]) {
     obj.teamhomevictory = obj.teamhomevictory + 1;
   }
 
