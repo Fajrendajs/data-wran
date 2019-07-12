@@ -1,5 +1,6 @@
 const request = require("request-promise");
 const cheerio = require("cheerio");
+const _ = require("lodash");
 
 function scrapeWebPage(url) {
   return request.get(url).then(response => {
@@ -31,7 +32,7 @@ function scrapeWebPage(url) {
       })
       .toArray();
 
-    return rows.map(row => {
+    return rows.map((row, ind) => {
       const record = {};
       headers.forEach((fieldName, columnIndex) => {
         if (fieldName.trim().length > 0) {
@@ -73,6 +74,9 @@ function scrapeWebPage(url) {
               record[key] = linetemp[key].trim();
             }
           }
+
+          record["rbrd"] = ind + 1;
+
           /* kraj dodano posebno za covers.com*/
         }
       });
@@ -103,7 +107,7 @@ function handlescore(data) {
   const tempdata2 = tempdata[1].trim().split("-");
   obj.resulttype = tempdata[0];
   obj.teampoints = tempdata2[0];
-  obj.opponentpointsyear = tempdata2[1];
+  obj.opponentteampoints = tempdata2[1];
 
   return obj;
 }
@@ -154,12 +158,83 @@ function handlevs(data) {
   return obj;
 }
 
+function sort_data(objs) {
+  var sortedObjs = _.sortBy(objs, "rbrd");
+  //var sortedObjs = _.orderBy( objs, ['first_nom'],['dsc'] );
+  return sortedObjs;
+}
+
+function handlestatsinit(data) {
+  const obj = {
+    teamhomevictory: 0,
+    teamawayvictory: 0,
+    teamvictory: 0,
+    teamlost: 0,
+    teamawaylost: 0,
+    teamhomelost: 0
+  };
+
+  data.map((row, i) => {
+    return Object.assign(row, obj);
+  });
+}
+
+function handlestats(data) {
+  const obj = {};
+
+  if (data["teamplace"] === "vs") {
+  }
+  // team home victory
+  if (
+    data["teamplace"] === "vs" &&
+    data["teamponits"] > data["opponentteampoints"]
+  ) {
+    obj.teamhomevictory = obj.teamhomevictory + 1;
+  }
+  // team away victory
+  if (
+    data["teamplace"] !== "vs" &&
+    data["teamponits"] > data["opponentteampoints"]
+  ) {
+    obj.teamhomevictory = obj.teamhomevictory + 1;
+  }
+  // team  victory
+  if (data["teamponits"] > data["opponentteampoints"]) {
+    obj.teamhomevictory = obj.teamhomevictory + 1;
+  }
+  // team  victory
+  if (data["teamponits"] > data["opponentteampoints"]) {
+    obj.teamhomevictory = obj.teamhomevictory + 1;
+  }
+  // team home lost
+  if (
+    data["teamplace"] === "vs" &&
+    data["teamponits"] < data["opponentteampoints"]
+  ) {
+    obj.teamhomevictory = obj.teamhomevictory + 1;
+  }
+  // team away lost
+  if (
+    data["teamplace"] !== "vs" &&
+    data["teamponits"] < data["opponentteampoints"]
+  ) {
+    obj.teamhomevictory = obj.teamhomevictory + 1;
+  }
+
+  return obj;
+}
+
 function scrape_html(url) {
   //let url = "https://earthquake.usgs.gov/earthquakes/browse/largest-world.php";
   //  url = 'https://www.covers.com/Sports/mlb/teams/pastresults/2019/2967'
   return scrapeWebPage(url)
     .then(data => {
-      //  console.log(data);
+      //console.log(data);
+
+      const datasort = sort_data(data);
+      handlestatsinit(datasort);
+      handlestats();
+      console.log(datasort);
       return data;
     })
     .catch(err => {
