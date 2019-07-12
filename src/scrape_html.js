@@ -179,45 +179,47 @@ function handlestatsinit(data) {
   });
 }
 
-function handlestats(data) {
-  const obj = {};
+function handlestats(objs) {
+  let teamhomevictorytemp = 0;
+  let teamawayvictorytemp = 0;
+  let teamvictorytemp = 0;
+  let teamlostemp = 0;
+  let teamhomelosttemp = 0;
+  let teamawaylosttemp = 0;
 
-  if (data["teamplace"] === "vs") {
-  }
-  // team home victory
-  if (
-    data["teamplace"] === "vs" &&
-    data["teamponits"] > data["opponentteampoints"]
-  ) {
-    obj.teamhomevictory = obj.teamhomevictory + 1;
-  }
-  // team away victory
-  if (
-    data["teamplace"] !== "vs" &&
-    data["teamponits"] > data["opponentteampoints"]
-  ) {
-    obj.teamhomevictory = obj.teamhomevictory + 1;
-  }
-  // team  victory
-  if (data["teamponits"] > data["opponentteampoints"]) {
-    obj.teamhomevictory = obj.teamhomevictory + 1;
-  }
-  // team  victory
-  if (data["teamponits"] > data["opponentteampoints"]) {
-    obj.teamhomevictory = obj.teamhomevictory + 1;
-  }
-  // team home lost
-  if (data["teamplace"] === "vs" &&
-    data["teamponits"] < data["opponentteampoints"]) {
-    obj.teamhomevictory = obj.teamhomevictory + 1;
-  }
-  // team away lost
-  if (data["teamplace"] !== "vs" &&
-    data["teamponits"] < data["opponentteampoints"]) {
-    obj.teamhomevictory = obj.teamhomevictory + 1;
-  }
+  objs.map((data, i) => {
+    // team home victory
+    if (data.teamplace === "vs" && data.teampoints > data.opponentteampoints) {
+      teamhomevictorytemp = teamhomevictorytemp + 1;
+    }
+    // team away victory
+    if (data.teamplace !== "vs" && data.teampoints > data.opponentteampoints) {
+      teamawayvictorytemp = teamawayvictorytemp + 1;
+    }
+    // team  victory
+    if (data.teampoints > data.opponentteampoints) {
+      teamvictorytemp = teamvictorytemp + 1;
+    }
+    // team  lost
+    if (data.teampoints < data.opponentteampoints) {
+      teamlostemp = teamlostemp + 1;
+    }
+    // team home lost
+    if (data.teamplace === "vs" && data.teampoints < data.opponentteampoints) {
+      teamhomelosttemp = teamhomelosttemp + 1;
+    }
+    // team away lost
+    if (data.teamplace !== "vs" && data.teampoints < data.opponentteampoints) {
+      teamawaylosttemp = teamawaylosttemp + 1;
+    }
 
-  return obj;
+    data.teamhomevictory = teamhomevictorytemp;
+    data.teamawayvictory = teamawayvictorytemp;
+    data.teamvictory = teamvictorytemp;
+    data.teamlost = teamlostemp;
+    data.teamhomelost = teamhomelosttemp;
+    data.teamawaylost = teamawaylosttemp;
+  });
 }
 
 function scrape_html(url) {
@@ -229,7 +231,7 @@ function scrape_html(url) {
 
       const datasort = sort_data(data);
       handlestatsinit(datasort);
-      handlestats();
+      handlestats(datasort);
       console.log(datasort);
       return data;
     })

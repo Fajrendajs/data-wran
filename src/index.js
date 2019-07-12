@@ -29,6 +29,7 @@ app.get("/scrape_html", function(request, response) {
     const result = papa.unparse(data);
     //console.log(result);
     // file.write(filename2, result);
+    console.log(filename2);
     spremi(filename2, result);
   });
 });
